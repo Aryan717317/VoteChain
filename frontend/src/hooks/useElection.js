@@ -21,16 +21,29 @@ export const useElection = () => {
   }, [contracts?.Election]);
 
   const checkNetwork = async (toast) => {
-    if (!contracts?.Election?.runner?.provider) {
-      toast.error('Blockchain not connected. Please connect your wallet.');
+    try {
+      const runner = contracts?.Election?.runner;
+      let provider = runner?.provider;
+      if (!provider && runner && typeof runner.getNetwork === 'function') {
+        provider = runner;
+      }
+
+      if (!provider) {
+        toast.error('Blockchain not connected. Please connect your wallet.');
+        return false;
+      }
+
+      const network = await provider.getNetwork();
+      if (network.chainId.toString() !== CONTRACT_ADDRESSES.NETWORK_ID) {
+        toast.error(`Wrong Network! Please switch to Hardhat (Chain ID: ${CONTRACT_ADDRESSES.NETWORK_ID})`);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("Network check failed:", err);
+      toast.error('Failed to verify network connection.');
       return false;
     }
-    const network = await contracts.Election.runner.provider.getNetwork();
-    if (network.chainId.toString() !== CONTRACT_ADDRESSES.NETWORK_ID) {
-      toast.error(`Wrong Network! Please switch to Hardhat (Chain ID: ${CONTRACT_ADDRESSES.NETWORK_ID})`);
-      return false;
-    }
-    return true;
   };
 
   const advancePhase = async (toast) => {

@@ -15,17 +15,25 @@ export const handleTransaction = async (txPromise, toast, successMsg = 'Transact
     
     let errorMsg = 'Transaction failed. ';
     
-    // Ethers v6 error handling
-    if (error.code === 'ACTION_REJECTED') {
-      errorMsg = 'Transaction rejected by user.';
-    } else if (error.code === 'INSUFFICIENT_FUNDS') {
-      errorMsg = 'Insufficient ETH for gas.';
-    } else if (error.code === 'CALL_EXCEPTION') {
-      errorMsg = error.reason ? `Reverted: ${error.reason}` : 'Smart contract call failed.';
-    } else if (error.shortMessage) {
-      errorMsg = error.shortMessage;
+    if (error && typeof error === 'object') {
+      if (error.code === 'ACTION_REJECTED') {
+        errorMsg = 'Transaction rejected by user.';
+      } else if (error.code === 'INSUFFICIENT_FUNDS') {
+        errorMsg = 'Insufficient ETH for gas.';
+      } else if (error.code === 'CALL_EXCEPTION') {
+        errorMsg = error.reason ? `Reverted: ${error.reason}` : 'Smart contract call failed (Execution Reverted).';
+      } else if (error.shortMessage) {
+        errorMsg = error.shortMessage;
+      } else if (error.info && error.info.error && error.info.error.message) {
+        // Handle nested internal JSON-RPC errors
+        errorMsg += error.info.error.message;
+      } else if (error.message) {
+        errorMsg += error.message.split(' (')[0];
+      } else {
+        errorMsg += 'Unknown error occurred.';
+      }
     } else {
-      errorMsg += error.message.split(' (')[0];
+      errorMsg += String(error);
     }
 
     toast.error(errorMsg, { id: toastId === 'tx-loading' ? 'tx-error' : toastId });
