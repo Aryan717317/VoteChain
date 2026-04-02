@@ -5,7 +5,7 @@ import { useVoter } from '../hooks/useVoter';
 import { WalletContext } from '../context/WalletContext';
 
 const Admin = () => {
-  const { phase, error, getPhase, advancePhase, addCandidate, resetPhase } = useElection();
+  const { phase, error, getPhase, advancePhase, addCandidate, resetPhase, adminAddress } = useElection();
   const { registerVoter } = useVoter();
   const { account, connectWallet } = useContext(WalletContext);
 
