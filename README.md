@@ -9,7 +9,7 @@
 
 ---
 
-## 🌟 The "Layman's" Explanation
+## 🌟 What's "VoteChain"
 ### *Imagine a locked glass box in the middle of the town square...*
 
 In a traditional election, you drop a paper slip into a box, and someone take it behind closed doors to count it. You *hope* they count it right. You *hope* they don't lose the box.
