@@ -1,0 +1,23 @@
+{
+  "name": "voting-dapp",
+  "version": "1.0.0",
+  "description": "VoteChain - Decentralized Voting System",
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "coverage": "npx hardhat coverage"
+  },
+  "keywords": [
+    "blockchain",
+    "voting",
+    "ethereum",
+    "dapp"
+  ],
+  "author": "Aryan Bharat Kumar",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^17.4.0",
+    "hardhat": "^2.28.6"
+  }
+}
