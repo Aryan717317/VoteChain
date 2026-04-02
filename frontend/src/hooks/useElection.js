@@ -18,12 +18,14 @@ export const useElection = () => {
 
   const advancePhase = async (toast) => {
     if (!contracts) return false;
-    return await handleTransaction(contracts.Election.advancePhase(), toast, 'Phase advanced!');
+    const currentPhase = await contracts.Election.currentPhase();
+    return await handleTransaction(contracts.Election.setPhase(Number(currentPhase) + 1), toast, 'Phase advanced!');
   };
 
   const addCandidate = async (name, party, toast) => {
     if (!contracts) return false;
-    return await handleTransaction(contracts.Election.addCandidate(name, party), toast, 'Candidate added!');
+    const fullName = party ? `${name} (${party})` : name;
+    return await handleTransaction(contracts.Election.addCandidate(fullName), toast, 'Candidate added!');
   };
 
   return { phase, getPhase, advancePhase, addCandidate };
