@@ -10,7 +10,7 @@ export const useVoter = () => {
   const checkVoterRegistration = useCallback(async (address) => {
     if (!contracts || !address) return;
     try {
-      const status = await contracts.VoterRegistry.isWhitelisted(address);
+      const status = await contracts.VoterRegistry.isRegistered(address);
       setIsRegistered(status);
     } catch (err) {
       console.error(err);
