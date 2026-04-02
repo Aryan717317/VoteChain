@@ -53,11 +53,15 @@ const Admin = () => {
           <button 
             onClick={handleAdvancePhase}
             disabled={phase >= 3}
-            className={`px-6 py-2 rounded-lg font-bold transition-colors ${
-              phase >= 3 ? 'bg-gray-300 text-gray-500' : 'bg-blue-600 hover:bg-blue-700 text-white'
+            className={`px-6 py-2 rounded-lg font-bold transition-all shadow-md active:scale-95 ${
+              phase === 2 
+                ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse' 
+                : phase >= 3 
+                  ? 'bg-gray-300 text-gray-500' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
-            Advance to {PHASES[phase + 1] || 'None'}
+            {phase === 2 ? 'Close Polls & End Election' : `Advance to ${PHASES[phase + 1] || 'None'}`}
           </button>
         </div>
       </div>
