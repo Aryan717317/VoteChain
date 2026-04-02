@@ -1,29 +1,47 @@
 import { useState, useCallback } from 'react';
 import { useContracts } from './useContracts';
 import { handleTransaction } from '../utils/txHelpers';
+import { CONTRACT_ADDRESSES } from '../config/contracts';
 
 export const useVoter = () => {
   const contracts = useContracts();
   const [isRegistered, setIsRegistered] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
 
+  const checkNetwork = async (toast) => {
+    const provider = contracts?.Election?.runner?.provider;
+    if (!provider) {
+      toast.error('Blockchain not connected. Please connect your wallet.');
+      return false;
+    }
+    const network = await provider.getNetwork();
+    if (network.chainId.toString() !== CONTRACT_ADDRESSES.NETWORK_ID) {
+      toast.error(`Wrong Network! Switch to Hardhat (ID: ${CONTRACT_ADDRESSES.NETWORK_ID})`);
+      return false;
+    }
+    return true;
+  };
+
   const checkVoterRegistration = useCallback(async (address) => {
-    if (!contracts || !address) return;
+    if (!contracts?.VoterRegistry || !address) return;
     try {
       const status = await contracts.VoterRegistry.isRegistered(address);
       setIsRegistered(status);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch voter registration:', err);
     }
-  }, [contracts]);
+  }, [contracts?.VoterRegistry]);
 
   const registerVoter = async (address, toast) => {
-    if (!contracts) return false;
-    return await handleTransaction(contracts.VoterRegistry.registerVoter(address), toast, 'Voter registered successfully!');
+    if (!contracts?.VoterRegistry) return false;
+    if (!(await checkNetwork(toast))) return false;
+    return await handleTransaction(contracts.VoterRegistry.registerVoter(address), toast, 'Voter whitelisted successfully!');
   };
 
   const castVote = async (candidateId, toast) => {
-    if (!contracts) return false;
+    if (!contracts?.Voting) return false;
+    if (!(await checkNetwork(toast))) return false;
+    
     const success = await handleTransaction(contracts.Voting.castVote(candidateId), toast, 'Vote cast successfully!');
     if (success) {
       setHasVoted(true);

@@ -4,7 +4,7 @@ import { useElection } from '../hooks/useElection';
 import { useVoter } from '../hooks/useVoter';
 
 const Admin = () => {
-  const { phase, getPhase, advancePhase, addCandidate } = useElection();
+  const { phase, error, getPhase, advancePhase, addCandidate } = useElection();
   const { registerVoter } = useVoter();
 
   const [address, setAddress] = useState('');
@@ -40,15 +40,38 @@ const Admin = () => {
   const PHASES = ['SETUP', 'REGISTRATION', 'VOTING', 'ENDED'];
 
   return (
-    <div className="max-w-4xl mx-auto py-10">
+    <div className="max-w-4xl mx-auto py-10 px-4 relative">
       <h1 className="text-4xl font-bold mb-8">Election Administration</h1>
+
+      {/* Connection Guards */}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
+          <p className="text-red-800 font-medium">
+            Error: Could not connect to the election contract. Please check if your MetaMask is on the local network (31337) and that you have deployed the contracts.
+          </p>
+        </div>
+      )}
+
+      {phase === null && !error && (
+        <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Connecting to Blockchain...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Progress Indicator */}
+
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
         <h2 className="text-2xl font-bold mb-4">Phase Management</h2>
         <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
           <div>
             <span className="text-gray-500 font-medium">Current Phase:</span>
-            <span className="ml-2 font-bold text-blue-600 text-lg">{PHASES[phase]}</span>
+            <span className="ml-2 font-bold text-blue-600 text-lg">
+              {phase !== null ? PHASES[phase] : 'Connecting...'}
+            </span>
           </div>
           <button 
             onClick={handleAdvancePhase}
