@@ -1,9 +1,8 @@
 export const handleTransaction = async (txPromise, toast, successMsg = 'Transaction successful!') => {
-  let toastId = 'tx-loading';
+  let toastId = toast.loading('Please confirm transaction in your wallet...');
   try {
     const tx = await txPromise;
-    toastId = tx.hash;
-    toast.loading('Waiting for transaction confirmation...', { id: toastId });
+    toast.loading('Transaction submitted. Waiting for blockchain confirmation...', { id: toastId });
     
     const receipt = await tx.wait();
     if (receipt.status === 0) throw new Error('Transaction reverted on-chain.');
