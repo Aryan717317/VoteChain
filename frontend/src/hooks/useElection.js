@@ -7,15 +7,18 @@ export const useElection = () => {
   const contracts = useContracts();
   const [phase, setPhase] = useState(null); // Changed from 0 to null to indicate 'loading'
   const [error, setError] = useState(false);
+  const [adminAddress, setAdminAddress] = useState(null);
 
   const getPhase = useCallback(async () => {
     if (!contracts?.Election) return;
     try {
       const currentPhase = await contracts.Election.currentPhase();
+      const admin = await contracts.Election.admin();
       setPhase(Number(currentPhase));
+      setAdminAddress(admin.toLowerCase());
       setError(false);
     } catch (err) {
-      console.error('Failed to fetch phase:', err);
+      console.error('Failed to fetch phase or admin:', err);
       setError(true);
     }
   }, [contracts?.Election]);
@@ -84,5 +87,5 @@ export const useElection = () => {
     return await handleTransaction(contracts.Election.resetPhase(), toast, 'Election phase reset to SETUP!');
   };
 
-  return { phase, error, getPhase, advancePhase, addCandidate, resetPhase };
+  return { phase, error, getPhase, advancePhase, addCandidate, resetPhase, adminAddress };
 };

@@ -17,32 +17,58 @@ const Admin = () => {
     getPhase();
   }, [getPhase]);
 
+  const isAdminConnected = account && adminAddress && account.toLowerCase() === adminAddress.toLowerCase();
+
   const handleAdvancePhase = async () => {
-    await advancePhase(toast);
-    getPhase(); 
+    if (!isAdminConnected) return toast.error("Only the election admin can perform this action.");
+    try {
+      await advancePhase(toast);
+      getPhase(); 
+    } catch (e) {
+      console.error(e);
+      toast.error(`UI Error: ${e.message}`);
+    }
   };
 
   const handleResetPhase = async () => {
+    if (!isAdminConnected) return toast.error("Only the election admin can perform this action.");
     if (window.confirm("Are you sure you want to reset the election back to SETUP phase?")) {
-      await resetPhase(toast);
-      getPhase();
+      try {
+        await resetPhase(toast);
+        getPhase();
+      } catch (e) {
+        console.error(e);
+        toast.error(`UI Error: ${e.message}`);
+      }
     }
   };
 
   const handleRegisterVoter = async (e) => {
     e.preventDefault();
+    if (!isAdminConnected) return toast.error("Only the election admin can perform this action.");
     if (!address) return toast.error('Enter a valid Ethereum address');
-    const success = await registerVoter(address, toast);
-    if (success) setAddress('');
+    try {
+      const success = await registerVoter(address, toast);
+      if (success) setAddress('');
+    } catch (e) {
+      console.error(e);
+      toast.error(`UI Error: ${e.message}`);
+    }
   };
 
   const handleAddCandidate = async (e) => {
     e.preventDefault();
+    if (!isAdminConnected) return toast.error("Only the election admin can perform this action.");
     if (!candidateName || !candidateParty) return toast.error('Enter all candidate details');
-    const success = await addCandidate(candidateName, candidateParty, toast);
-    if (success) {
-      setCandidateName('');
-      setCandidateParty('');
+    try {
+      const success = await addCandidate(candidateName, candidateParty, toast);
+      if (success) {
+        setCandidateName('');
+        setCandidateParty('');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error(`UI Error: ${e.message}`);
     }
   };
 
@@ -57,6 +83,18 @@ const Admin = () => {
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
           <p className="text-red-800 font-medium">
             Error: Could not connect to the election contract. Please check if your MetaMask is on the local network (31337) and that you have deployed the contracts.
+          </p>
+        </div>
+      )}
+
+      {account && adminAddress && !isAdminConnected && !error && (
+        <div className="bg-red-50 border-l-4 border-red-600 p-6 mb-8 rounded shadow-sm">
+          <h2 className="text-xl font-bold text-red-800 mb-2">Access Denied: Not Admin</h2>
+          <p className="text-red-700 mb-2">
+            The connected wallet is <strong>{account}</strong>, but the election admin is <strong>{adminAddress}</strong>.
+          </p>
+          <p className="text-red-700 font-medium">
+            Please switch your MetaMask account to the admin address to manage the election!
           </p>
         </div>
       )}
@@ -92,6 +130,7 @@ const Admin = () => {
       )}
 
       {/* Progress Indicator */}
+
 
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
