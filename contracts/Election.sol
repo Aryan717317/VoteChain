@@ -39,7 +39,7 @@ contract Election {
     }
 
     function addCandidate(string memory name) external onlyAdmin {
-        require(currentPhase == Phase.SETUP, "Not in SETUP phase");
+        require(currentPhase == Phase.SETUP || currentPhase == Phase.REGISTRATION, "Not in SETUP or REGISTRATION phase");
         require(bytes(name).length > 0, "Empty name");
         candidates.push(Candidate(name, 0));
         emit CandidateAdded(candidates.length - 1, name);
@@ -49,6 +49,12 @@ contract Election {
         require(uint(newPhase) == uint(currentPhase) + 1, "Must advance forward");
         currentPhase = newPhase;
         emit PhaseChanged(newPhase);
+    }
+
+    /// @notice Reset the election phase to SETUP (only for admin/testing)
+    function resetPhase() external onlyAdmin {
+        currentPhase = Phase.SETUP;
+        emit PhaseChanged(Phase.SETUP);
     }
 
     function getCandidateCount() external view returns (uint) {

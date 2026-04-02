@@ -50,9 +50,26 @@ export const useElection = () => {
     if (!contracts?.Election) return false;
     if (!(await checkNetwork(toast))) return false;
 
+    try {
+      const currentPhase = await contracts.Election.currentPhase();
+      if (Number(currentPhase) > 1) {
+        toast.error('Candidates can only be added during SETUP or REGISTRATION phase.');
+        return false;
+      }
+    } catch (err) {
+      toast.error('Failed to verify phase.');
+      return false;
+    }
+
     const fullName = party ? `${name} (${party})` : name;
     return await handleTransaction(contracts.Election.addCandidate(fullName), toast, 'Candidate added!');
   };
 
-  return { phase, error, getPhase, advancePhase, addCandidate };
+  const resetPhase = async (toast) => {
+    if (!contracts?.Election) return false;
+    if (!(await checkNetwork(toast))) return false;
+    return await handleTransaction(contracts.Election.resetPhase(), toast, 'Election phase reset to SETUP!');
+  };
+
+  return { phase, error, getPhase, advancePhase, addCandidate, resetPhase };
 };
