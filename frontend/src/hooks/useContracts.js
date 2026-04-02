@@ -11,12 +11,12 @@ export const useContracts = () => {
   const { provider, signer } = useContext(WalletContext);
 
   const contracts = useMemo(() => {
-    if (!provider) return null;
+    if (!provider || !CONTRACT_ADDRESSES.ELECTION) return null;
     const runner = signer || provider;
     return {
-      Election: new Contract(CONTRACT_ADDRESSES.Election, ElectionABI.abi, runner),
-      VoterRegistry: new Contract(CONTRACT_ADDRESSES.VoterRegistry, VoterRegistryABI.abi, runner),
-      Voting: new Contract(CONTRACT_ADDRESSES.Voting, VotingABI.abi, runner)
+      Election: new Contract(CONTRACT_ADDRESSES.ELECTION, ElectionABI.abi, runner),
+      VoterRegistry: new Contract(CONTRACT_ADDRESSES.VOTER_REGISTRY, VoterRegistryABI.abi, runner),
+      Voting: new Contract(CONTRACT_ADDRESSES.VOTING, VotingABI.abi, runner)
     };
   }, [provider, signer]);
 
